@@ -1,0 +1,14 @@
+{
+    "debug": true,
+    "connections": [
+        {
+            "name": "default",
+            "driver": "pdo",
+            "dbname": "",
+            "dbhost": "",
+            "dbuser": "",
+            "dbpassword": "",
+            "charset": "utf8"
+        }
+    ]
+}
