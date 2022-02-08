@@ -60,6 +60,8 @@ class UserTrack extends DefaultModel{
                 (new DateTime())->format('Y-m-d H:i:s'),
                 $existedTrackId
             ])->rowsCount();
+            
+            return $existedTrackId;
         }
     }
 }
