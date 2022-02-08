@@ -7,6 +7,7 @@ class App{
     protected $appRoot;
     protected $configs = [];
     protected $request;
+    protected $session;
 
     protected function initConnections(){
         $connections = $this->getConfig('main')->get('connections');
@@ -21,7 +22,13 @@ class App{
     }
 
     protected function collectRequest(){
+        
         $this->request = new Request($_REQUEST, $_SERVER);
+    }
+
+    protected function initSession(){
+        session_start();
+        $this->session = new Session($_SESSION);
     }
 
     public function getConfig($name): Config{
@@ -47,6 +54,7 @@ class App{
             $this->getConfig('main')->set('appRoot', $appRoot);
             $this->initConnections();
             $this->collectRequest();
+            $this->initSession();
         } catch (Throwable $error){
             if($debugMode){
                 echo $error->getMessage() . "\n" . $error->getTrace();
@@ -60,7 +68,7 @@ class App{
         if(class_exists($controllerClass)){
             if(method_exists($controllerClass, $action)){
                 $controller = new $controllerClass();
-                $response = $controller->$action($this->getConfig('main'), $this->request);
+                $response = $controller->$action($this->getConfig('main'), $this->request, $this->session);
                 $response->send();
             } else {
                 throw new \Exception('Controller action not found: ' . $action);

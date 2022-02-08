@@ -5,6 +5,7 @@ class Request{
 
     protected $request;
     protected $server;
+    protected $session;
     function __construct($request, $server){
         $this->request = $request;
         $this->server = $server;
@@ -19,7 +20,12 @@ class Request{
     }
 
     public function getUserAgent(){
-        return $this->server['HTTP_USER_AGENT'];
+        if(isset($this->server['HTTP_USER_AGENT']) && !empty($this->server['HTTP_USER_AGENT'])){
+            return $this->server['HTTP_USER_AGENT'];
+        } else {
+            return "No agent";
+        }
+        
     }
 
     public function getIp(){
@@ -33,4 +39,5 @@ class Request{
 
         return $ip;
     }
+
 }

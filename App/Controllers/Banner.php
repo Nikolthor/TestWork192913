@@ -7,11 +7,12 @@ use App\Core\Interfaces\Response;
 use App\Core\Request;
 use App\Core\ResponseError;
 use App\Core\ResponseImage;
+use App\Core\Session;
 use App\Models\UserAgent;
 use App\Models\UserTrack;
 
 class Banner{
-    function show(Config $appConfig, Request $request): Response{
+    function show(Config $appConfig, Request $request, Session $session): Response {
         $bannerId = $request->get('banner');
         $origin = $request->get('origin');
         $userAgentString = $request->getUserAgent();
@@ -23,12 +24,26 @@ class Banner{
             return new ResponseError(404, 'Banner not found');
         }
 
+
         $userTrack = new UserTrack();
         $userAgent = new UserAgent();
 
-        if($userAgentId = $userAgent->updateUserAgent($userAgentString)){
-            $userTrack->updateUserTrack($ip, $userAgentId, $origin);
+
+        $userAgentHash = UserAgent::userAgentHash($userAgentString);
+
+        $userAgentCache = $session->get('userAgentCache');
+
+        if(!isset($userAgentCache[$userAgentHash]) || empty($userAgentCache[$userAgentHash])){
+            $userAgentId = $userAgent->updateUserAgent($userAgentString);
+            $userAgentCache = [
+                $userAgentHash => $userAgentId
+            ];
+            $session->set('userAgentCache', $userAgentCache);
+        } else {
+            $userAgentId = $userAgentCache[$userAgentHash];
         }
+
+        $userTrack->updateUserTrack($ip, $userAgentId, $origin);
         
         return new ResponseImage($imagePath);
     }
