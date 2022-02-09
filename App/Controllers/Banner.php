@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\ResponseError;
 use App\Core\ResponseImage;
 use App\Core\Session;
+use App\Core\Tools\Path;
 use App\Models\UserAgent;
 use App\Models\UserTrack;
 
@@ -18,7 +19,7 @@ class Banner{
         $userAgentString = $request->getUserAgent();
         $ip = $request->getIp();
 
-        $imagePath = $appConfig->get('appRoot').'/public/banners/'.$bannerId;
+        $imagePath = Path::filterBackPath($appConfig->get('appRoot').'/public/banners/'.$bannerId);
 
         if(!is_file($imagePath)){
             return new ResponseError(404, 'Banner not found');
